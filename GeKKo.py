@@ -27,11 +27,7 @@ def valideaza_runda(runda_text, numar_numere_asteptat, numar_min, numar_max):
         if len(numere) < 1:
             return False, "Eroare: Runda trebuie să conțină cel puțin un număr"
         
-        # Verifică intervalul
-        for num in numere:
-            if num < numar_min or num > numar_max:
-                return False, f"Eroare: Numerele trebuie să fie în intervalul {numar_min}-{numar_max}"
-        
+        # FĂRĂ VERIFICARE DE INTERVAL - ORICE NUMERE SUNT ACCEPTATE
         return True, numere
     except ValueError:
         return False, "Eroare: Format invalid - folosește virgulă între numere (ex: 2, 6, 8, 55, 45, 37, 27)"
@@ -61,8 +57,8 @@ st.sidebar.header("⚙️ Configurare")
 
 numar_min = st.sidebar.number_input(
     "Număr minim",
-    min_value=1,
-    max_value=100,
+    min_value=-999999,
+    max_value=999999,
     value=1,
     step=1
 )
@@ -70,7 +66,7 @@ numar_min = st.sidebar.number_input(
 numar_max = st.sidebar.number_input(
     "Număr maxim",
     min_value=numar_min + 1,
-    max_value=200,
+    max_value=999999,
     value=49,
     step=1
 )
@@ -78,7 +74,7 @@ numar_max = st.sidebar.number_input(
 numar_numere_per_combinatie = st.sidebar.number_input(
     "Câte numere per combinație",
     min_value=1,
-    max_value=20,
+    max_value=1000,
     value=7,
     step=1
 )
@@ -98,7 +94,7 @@ with col1:
     uploaded_file = st.file_uploader(
         "📁 Importă runde din fișier .txt",
         type=['txt'],
-        help="Fiecare rundă pe o linie nouă, numere separate prin virgulă. Rundele pot avea număr diferit de numere."
+        help="Fiecare rundă pe o linie nouă, numere separate prin virgulă. FĂRĂ LIMITE - orice numere și orice cantitate!"
     )
     
     if uploaded_file is not None:
@@ -144,10 +140,10 @@ with col2:
 st.subheader("✍️ Adaugă runde manual")
 
 runda_manuala = st.text_area(
-    f"Introduceți rundele (orice număr de numere per rundă, separate prin virgulă)",
+    f"Introduceți rundele (FĂRĂ LIMITE - orice numere, orice cantitate)",
     height=150,
-    placeholder=f"Exemplu:\n2, 6, 8, 55, 45\n12, 23, 34, 45, 16, 28, 39, 41\n5, 15, 25",
-    help="Fiecare rundă pe o linie nouă - rundele pot avea numere diferite"
+    placeholder=f"Exemplu:\n2, 6, 8, 155, 245\n500, 1000, 2500, 5000\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
+    help="Fiecare rundă pe o linie nouă - COMPLET LIBER, fără limite!"
 )
 
 if st.button("➕ Adaugă rundele", type="primary"):
