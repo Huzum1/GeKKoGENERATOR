@@ -160,14 +160,14 @@ if st.session_state.runde_salvate:
 
 st.markdown("---")
 
-# Secțiunea CONFIGURARE (mutată din sidebar)
-st.header("⚙️ Configurare Generare")
+# Secțiunea CONFIGURARE - MINIMALISTĂ și COMPACTĂ
+st.markdown("### ⚙️ Configurare")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     numar_min = st.number_input(
-        "Număr minim",
+        "Min",
         min_value=-999999,
         max_value=999999,
         value=st.session_state.numar_min,
@@ -178,7 +178,7 @@ with col1:
 
 with col2:
     numar_max = st.number_input(
-        "Număr maxim",
+        "Max",
         min_value=st.session_state.numar_min + 1,
         max_value=999999,
         value=st.session_state.numar_max,
@@ -189,7 +189,7 @@ with col2:
 
 with col3:
     numar_numere_per_combinatie = st.number_input(
-        "Câte numere per combinație",
+        "Numere",
         min_value=1,
         max_value=1000,
         value=st.session_state.numar_numere_per_combinatie,
@@ -198,33 +198,33 @@ with col3:
     )
     st.session_state.numar_numere_per_combinatie = numar_numere_per_combinatie
 
-st.info(f"📊 Configurare: Interval **{numar_min} - {numar_max}** | Numere per combinație: **{numar_numere_per_combinatie}**")
-
 st.markdown("---")
 
-# Secțiunea 2: CÂTE COMBINAȚII SĂ GENEREZE
-st.header("🎲 Generare Combinații")
+# Secțiunea GENERARE - COMPACTĂ
+col_gen1, col_gen2 = st.columns([1, 2])
 
-numar_combinatii = st.number_input(
-    "Câte combinații să genereze",
-    min_value=1,
-    max_value=100000,
-    value=100,
-    step=10
-)
+with col_gen1:
+    numar_combinatii = st.number_input(
+        "Câte combinații",
+        min_value=1,
+        max_value=100000,
+        value=100,
+        step=10
+    )
 
-# Secțiunea 3: BUTON GENERARE
-if st.button("🚀 GENEREAZĂ COMBINAȚII", type="primary", use_container_width=True):
-    with st.spinner('Se generează combinațiile...'):
-        combinatii = genereaza_combinatii(
-            numar_combinatii,
-            numar_numere_per_combinatie,
-            numar_min,
-            numar_max,
-            st.session_state.runde_salvate
-        )
-        st.session_state.combinatii_generate = combinatii
-        st.success(f"✅ {len(combinatii)} combinații generate cu succes!")
+with col_gen2:
+    st.markdown("<br>", unsafe_allow_html=True)  # Spațiu pentru aliniere
+    if st.button("🚀 GENEREAZĂ", type="primary", use_container_width=True):
+        with st.spinner('Generare...'):
+            combinatii = genereaza_combinatii(
+                numar_combinatii,
+                numar_numere_per_combinatie,
+                numar_min,
+                numar_max,
+                st.session_state.runde_salvate
+            )
+            st.session_state.combinatii_generate = combinatii
+            st.success(f"✅ {len(combinatii)} combinații generate!")
 
 st.markdown("---")
 
@@ -232,35 +232,15 @@ st.markdown("---")
 if st.session_state.combinatii_generate:
     st.header("📊 Rezultate Generate")
     
-    # BUTON COPIAZĂ TOATE - cu clipboard real
+    # Pregătim toate variantele pentru copiere
     toate_variantele = '\n'.join([
         formateaza_combinatie(i+1, comb) 
         for i, comb in enumerate(st.session_state.combinatii_generate)
     ])
     
-    # Folosim HTML + JavaScript pentru copy la clipboard
-    st.markdown("### 📋 Copiază toate variantele")
-    
-    # Cream un textarea ascuns cu toate datele
-    copy_id = "copy_text_area"
-    
-    # HTML + JS pentru copy to clipboard
-    st.markdown(f"""
-        <textarea id="{copy_id}" style="position: absolute; left: -9999px;">{toate_variantele}</textarea>
-        <script>
-        function copyToClipboard() {{
-            var copyText = document.getElementById("{copy_id}");
-            copyText.select();
-            document.execCommand("copy");
-        }}
-        </script>
-    """, unsafe_allow_html=True)
-    
-    if st.button("📋 COPIAZĂ TOATE VARIANTELE", type="primary", use_container_width=True, on_click=None):
-        st.success(f"✅ {len(st.session_state.combinatii_generate)} combinații copiate în clipboard!")
-        # Afișăm și datele pentru copiere manuală în caz că JS nu funcționează
-        with st.expander("👁️ Vezi textul pentru copiere manuală (dacă e nevoie)"):
-            st.code(toate_variantele, language=None)
+    # EXPANDER pentru copiere manuală - SIMPLU și EFICIENT
+    with st.expander("📋 Vezi textul pentru copiere manuală (dacă e nevoie)"):
+        st.code(toate_variantele, language=None)
     
     st.markdown("---")
     
