@@ -54,6 +54,15 @@ st.markdown("---")
 
 # MAIN PAGE
 
+# Configurare INIȚIALĂ (definită înainte de orice altceva)
+# Valorile se vor actualiza mai jos în interfață
+if 'numar_min' not in st.session_state:
+    st.session_state.numar_min = 1
+if 'numar_max' not in st.session_state:
+    st.session_state.numar_max = 49
+if 'numar_numere_per_combinatie' not in st.session_state:
+    st.session_state.numar_numere_per_combinatie = 7
+
 # Secțiunea 1: ISTORIC RUNDE
 st.header("📋 Istoric Runde")
 
@@ -79,9 +88,9 @@ with col1:
                 if linie.strip():
                     valid, rezultat = valideaza_runda(
                         linie,
-                        numar_numere_per_combinatie,
-                        numar_min,
-                        numar_max
+                        st.session_state.numar_numere_per_combinatie,
+                        st.session_state.numar_min,
+                        st.session_state.numar_max
                     )
                     if valid:
                         runde_noi.append(rezultat)
@@ -125,9 +134,9 @@ if st.button("➕ Adaugă rundele", type="primary"):
             if linie.strip():
                 valid, rezultat = valideaza_runda(
                     linie,
-                    numar_numere_per_combinatie,
-                    numar_min,
-                    numar_max
+                    st.session_state.numar_numere_per_combinatie,
+                    st.session_state.numar_min,
+                    st.session_state.numar_max
                 )
                 if valid:
                     st.session_state.runde_salvate.append(rezultat)
@@ -161,27 +170,33 @@ with col1:
         "Număr minim",
         min_value=-999999,
         max_value=999999,
-        value=1,
-        step=1
+        value=st.session_state.numar_min,
+        step=1,
+        key='input_numar_min'
     )
+    st.session_state.numar_min = numar_min
 
 with col2:
     numar_max = st.number_input(
         "Număr maxim",
-        min_value=numar_min + 1,
+        min_value=st.session_state.numar_min + 1,
         max_value=999999,
-        value=49,
-        step=1
+        value=st.session_state.numar_max,
+        step=1,
+        key='input_numar_max'
     )
+    st.session_state.numar_max = numar_max
 
 with col3:
     numar_numere_per_combinatie = st.number_input(
         "Câte numere per combinație",
         min_value=1,
         max_value=1000,
-        value=7,
-        step=1
+        value=st.session_state.numar_numere_per_combinatie,
+        step=1,
+        key='input_numar_numere'
     )
+    st.session_state.numar_numere_per_combinatie = numar_numere_per_combinatie
 
 st.info(f"📊 Configurare: Interval **{numar_min} - {numar_max}** | Numere per combinație: **{numar_numere_per_combinatie}**")
 
