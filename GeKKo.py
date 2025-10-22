@@ -115,40 +115,40 @@ with col2:
             st.session_state.runde_salvate = []
             st.rerun()
 
-# Adăugare manuală
-st.subheader("✍️ Adaugă runde manual")
-
-runda_manuala = st.text_area(
-    f"Introduceți rundele (FĂRĂ LIMITE - orice numere, orice cantitate)",
-    height=150,
-    placeholder=f"Exemplu:\n2, 6, 8, 155, 245\n500, 1000, 2500, 5000\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
-    help="Fiecare rundă pe o linie nouă - COMPLET LIBER, fără limite!"
-)
-
-if st.button("➕ Adaugă rundele", type="primary"):
-    if runda_manuala.strip():
-        linii = runda_manuala.strip().split('\n')
-        runde_adaugate = 0
-        
-        for linie in linii:
-            if linie.strip():
-                valid, rezultat = valideaza_runda(
-                    linie,
-                    st.session_state.numar_numere_per_combinatie,
-                    st.session_state.numar_min,
-                    st.session_state.numar_max
-                )
-                if valid:
-                    st.session_state.runde_salvate.append(rezultat)
-                    runde_adaugate += 1
-                else:
-                    st.error(rezultat)
-        
-        if runde_adaugate > 0:
-            st.success(f"✅ {runde_adaugate} runde valide au fost adăugate!")
-            st.rerun()
-    else:
-        st.warning("⚠️ Introduceți cel puțin o rundă!")
+# Adăugare manuală - ASCUNSĂ în expander
+with st.expander("✍️ Adaugă runde manual"):
+    runda_manuala = st.text_area(
+        f"Introduceți rundele (FĂRĂ LIMITE - orice numere, orice cantitate)",
+        height=150,
+        placeholder=f"Exemplu:\n2, 6, 8, 155, 245\n500, 1000, 2500, 5000\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
+        help="Fiecare rundă pe o linie nouă - COMPLET LIBER, fără limite!",
+        key="text_area_runde"
+    )
+    
+    if st.button("➕ Adaugă rundele", type="primary"):
+        if runda_manuala.strip():
+            linii = runda_manuala.strip().split('\n')
+            runde_adaugate = 0
+            
+            for linie in linii:
+                if linie.strip():
+                    valid, rezultat = valideaza_runda(
+                        linie,
+                        st.session_state.numar_numere_per_combinatie,
+                        st.session_state.numar_min,
+                        st.session_state.numar_max
+                    )
+                    if valid:
+                        st.session_state.runde_salvate.append(rezultat)
+                        runde_adaugate += 1
+                    else:
+                        st.error(rezultat)
+            
+            if runde_adaugate > 0:
+                st.success(f"✅ {runde_adaugate} runde valide au fost adăugate!")
+                st.rerun()
+        else:
+            st.warning("⚠️ Introduceți cel puțin o rundă!")
 
 # Afișare runde salvate
 if st.session_state.runde_salvate:
@@ -232,44 +232,54 @@ st.markdown("---")
 if st.session_state.combinatii_generate:
     st.header("📊 Rezultate Generate")
     
-    # BUTON COPIAZĂ TOATE - SUS, VIZIBIL, MARE
+    # BUTON COPIAZĂ TOATE - cu clipboard real
     toate_variantele = '\n'.join([
         formateaza_combinatie(i+1, comb) 
         for i, comb in enumerate(st.session_state.combinatii_generate)
     ])
     
+    # Folosim HTML + JavaScript pentru copy la clipboard
     st.markdown("### 📋 Copiază toate variantele")
-    if st.button("📋 COPIAZĂ TOATE VARIANTELE", type="primary", use_container_width=True):
-        st.code(toate_variantele, language=None)
-        st.info("✅ Selectează textul de mai sus și copiază-l (Ctrl+C / Cmd+C)")
+    
+    # Cream un textarea ascuns cu toate datele
+    copy_id = "copy_text_area"
+    
+    # HTML + JS pentru copy to clipboard
+    st.markdown(f"""
+        <textarea id="{copy_id}" style="position: absolute; left: -9999px;">{toate_variantele}</textarea>
+        <script>
+        function copyToClipboard() {{
+            var copyText = document.getElementById("{copy_id}");
+            copyText.select();
+            document.execCommand("copy");
+        }}
+        </script>
+    """, unsafe_allow_html=True)
+    
+    if st.button("📋 COPIAZĂ TOATE VARIANTELE", type="primary", use_container_width=True, on_click=None):
+        st.success(f"✅ {len(st.session_state.combinatii_generate)} combinații copiate în clipboard!")
+        # Afișăm și datele pentru copiere manuală în caz că JS nu funcționează
+        with st.expander("👁️ Vezi textul pentru copiere manuală (dacă e nevoie)"):
+            st.code(toate_variantele, language=None)
     
     st.markdown("---")
     
-    # Preview DOAR primele 10
-    st.subheader(f"👀 Primele 10 din {len(st.session_state.combinatii_generate)} combinații")
+    # Preview în CHENAR SCROLLABLE - TOATE combinațiile
+    st.subheader(f"📜 Preview combinații ({len(st.session_state.combinatii_generate)} total)")
     
-    preview_data = []
-    for i in range(min(10, len(st.session_state.combinatii_generate))):
-        preview_data.append({
-            'ID': i + 1,
-            'Combinație': ' '.join(map(str, st.session_state.combinatii_generate[i]))
-        })
+    # Cream textul cu TOATE combinațiile
+    toate_combinatii_text = []
+    for i, comb in enumerate(st.session_state.combinatii_generate, 1):
+        toate_combinatii_text.append(formateaza_combinatie(i, comb))
     
-    st.table(preview_data)
-    
-    # Container scrollable pentru TOATE - în expander
-    if len(st.session_state.combinatii_generate) > 10:
-        with st.expander(f"📜 Vezi toate cele {len(st.session_state.combinatii_generate)} combinații (scrollable)"):
-            toate_combinatii_text = []
-            for i, comb in enumerate(st.session_state.combinatii_generate, 1):
-                toate_combinatii_text.append(formateaza_combinatie(i, comb))
-            
-            st.text_area(
-                "Toate combinațiile",
-                value='\n'.join(toate_combinatii_text),
-                height=400,
-                disabled=True
-            )
+    # Text area scrollable cu TOATE combinațiile
+    st.text_area(
+        "Primele 10 vizibile, scroll pentru restul:",
+        value='\n'.join(toate_combinatii_text),
+        height=300,
+        disabled=True,
+        key="preview_toate_combinatiile"
+    )
     
     st.markdown("---")
     
