@@ -23,9 +23,9 @@ def valideaza_runda(runda_text, numar_numere_asteptat, numar_min, numar_max):
         # Curăță spațiile și împarte după virgulă
         numere = [int(x.strip()) for x in runda_text.strip().split(',')]
         
-        # Verifică numărul de numere
-        if len(numere) != numar_numere_asteptat:
-            return False, f"Eroare: Runda trebuie să conțină exact {numar_numere_asteptat} numere (conform configurării)"
+        # Verifică că sunt cel puțin 1 număr
+        if len(numere) < 1:
+            return False, "Eroare: Runda trebuie să conțină cel puțin un număr"
         
         # Verifică intervalul
         for num in numere:
@@ -98,7 +98,7 @@ with col1:
     uploaded_file = st.file_uploader(
         "📁 Importă runde din fișier .txt",
         type=['txt'],
-        help="Fiecare rundă pe o linie nouă, numere separate prin virgulă"
+        help="Fiecare rundă pe o linie nouă, numere separate prin virgulă. Rundele pot avea număr diferit de numere."
     )
     
     if uploaded_file is not None:
@@ -144,10 +144,10 @@ with col2:
 st.subheader("✍️ Adaugă runde manual")
 
 runda_manuala = st.text_area(
-    f"Introduceți rundele (câte {numar_numere_per_combinatie} numere per rundă, separate prin virgulă)",
+    f"Introduceți rundele (orice număr de numere per rundă, separate prin virgulă)",
     height=150,
-    placeholder=f"Exemplu:\n2, 6, 8, 55, 45, 37, 27\n12, 23, 34, 45, 16, 28, 39",
-    help="Fiecare rundă pe o linie nouă"
+    placeholder=f"Exemplu:\n2, 6, 8, 55, 45\n12, 23, 34, 45, 16, 28, 39, 41\n5, 15, 25",
+    help="Fiecare rundă pe o linie nouă - rundele pot avea numere diferite"
 )
 
 if st.button("➕ Adaugă rundele", type="primary"):
@@ -181,7 +181,7 @@ if st.session_state.runde_salvate:
     
     with st.expander("👁️ Vezi rundele salvate"):
         for idx, runda in enumerate(st.session_state.runde_salvate, 1):
-            st.text(f"{idx}. {', '.join(map(str, runda))}")
+            st.text(f"{idx}. [{len(runda)} numere] {', '.join(map(str, runda))}")
 
 st.markdown("---")
 
