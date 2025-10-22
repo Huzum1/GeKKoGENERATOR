@@ -163,23 +163,17 @@ st.markdown("---")
 # Secțiunea CONFIGURARE - MINIMALISTĂ și COMPACTĂ
 st.markdown("### ⚙️ Configurare")
 
-col1, col2, col3 = st.columns(3)
+# Număr minim rămâne ascuns, mereu 1
+numar_min = 1
+st.session_state.numar_min = numar_min
+
+# Afișăm doar Max și Numere
+col1, col2 = st.columns(2)
 
 with col1:
-    numar_min = st.number_input(
-        "Min",
-        min_value=-999999,
-        max_value=999999,
-        value=st.session_state.numar_min,
-        step=1,
-        key='input_numar_min'
-    )
-    st.session_state.numar_min = numar_min
-
-with col2:
     numar_max = st.number_input(
         "Max",
-        min_value=st.session_state.numar_min + 1,
+        min_value=2,
         max_value=999999,
         value=st.session_state.numar_max,
         step=1,
@@ -187,7 +181,7 @@ with col2:
     )
     st.session_state.numar_max = numar_max
 
-with col3:
+with col2:
     numar_numere_per_combinatie = st.number_input(
         "Numere",
         min_value=1,
