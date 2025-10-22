@@ -52,36 +52,6 @@ def formateaza_combinatie(id_combinatie, combinatie):
 st.title("🐲 GENERATOR DE BANI ♣️ - GeKKo 🐲")
 st.markdown("---")
 
-# SIDEBAR - Configurare
-st.sidebar.header("⚙️ Configurare")
-
-numar_min = st.sidebar.number_input(
-    "Număr minim",
-    min_value=-999999,
-    max_value=999999,
-    value=1,
-    step=1
-)
-
-numar_max = st.sidebar.number_input(
-    "Număr maxim",
-    min_value=numar_min + 1,
-    max_value=999999,
-    value=49,
-    step=1
-)
-
-numar_numere_per_combinatie = st.sidebar.number_input(
-    "Câte numere per combinație",
-    min_value=1,
-    max_value=1000,
-    value=7,
-    step=1
-)
-
-st.sidebar.markdown("---")
-st.sidebar.info(f"📊 Configurare curentă:\n- Interval: {numar_min} - {numar_max}\n- Numere per combinație: {numar_numere_per_combinatie}")
-
 # MAIN PAGE
 
 # Secțiunea 1: ISTORIC RUNDE
@@ -181,6 +151,42 @@ if st.session_state.runde_salvate:
 
 st.markdown("---")
 
+# Secțiunea CONFIGURARE (mutată din sidebar)
+st.header("⚙️ Configurare Generare")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    numar_min = st.number_input(
+        "Număr minim",
+        min_value=-999999,
+        max_value=999999,
+        value=1,
+        step=1
+    )
+
+with col2:
+    numar_max = st.number_input(
+        "Număr maxim",
+        min_value=numar_min + 1,
+        max_value=999999,
+        value=49,
+        step=1
+    )
+
+with col3:
+    numar_numere_per_combinatie = st.number_input(
+        "Câte numere per combinație",
+        min_value=1,
+        max_value=1000,
+        value=7,
+        step=1
+    )
+
+st.info(f"📊 Configurare: Interval **{numar_min} - {numar_max}** | Numere per combinație: **{numar_numere_per_combinatie}**")
+
+st.markdown("---")
+
 # Secțiunea 2: CÂTE COMBINAȚII SĂ GENEREZE
 st.header("🎲 Generare Combinații")
 
@@ -211,24 +217,21 @@ st.markdown("---")
 if st.session_state.combinatii_generate:
     st.header("📊 Rezultate Generate")
     
-    # BUTON COPIAZĂ TOATE - SUS, VIZIBIL
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        toate_variantele = '\n'.join([
-            formateaza_combinatie(i+1, comb) 
-            for i, comb in enumerate(st.session_state.combinatii_generate)
-        ])
-        
-        st.markdown("### 📋 Copiază toate variantele")
+    # BUTON COPIAZĂ TOATE - SUS, VIZIBIL, MARE
+    toate_variantele = '\n'.join([
+        formateaza_combinatie(i+1, comb) 
+        for i, comb in enumerate(st.session_state.combinatii_generate)
+    ])
+    
+    st.markdown("### 📋 Copiază toate variantele")
+    if st.button("📋 COPIAZĂ TOATE VARIANTELE", type="primary", use_container_width=True):
         st.code(toate_variantele, language=None)
-        
-        if st.button("📋 COPIAZĂ TOATE VARIANTELE", type="primary", use_container_width=True):
-            st.info("✅ Selectează textul de mai sus și copiază-l (Ctrl+C / Cmd+C)")
+        st.info("✅ Selectează textul de mai sus și copiază-l (Ctrl+C / Cmd+C)")
     
     st.markdown("---")
     
-    # Preview primele 10
-    st.subheader(f"👀 Preview - Primele 10 din {len(st.session_state.combinatii_generate)} combinații")
+    # Preview DOAR primele 10
+    st.subheader(f"👀 Primele 10 din {len(st.session_state.combinatii_generate)} combinații")
     
     preview_data = []
     for i in range(min(10, len(st.session_state.combinatii_generate))):
@@ -239,18 +242,19 @@ if st.session_state.combinatii_generate:
     
     st.table(preview_data)
     
-    # Container scrollable pentru TOATE
-    with st.expander(f"📜 Vezi toate cele {len(st.session_state.combinatii_generate)} combinații (scrollable)"):
-        toate_combinatii_text = []
-        for i, comb in enumerate(st.session_state.combinatii_generate, 1):
-            toate_combinatii_text.append(formateaza_combinatie(i, comb))
-        
-        st.text_area(
-            "Toate combinațiile",
-            value='\n'.join(toate_combinatii_text),
-            height=400,
-            disabled=True
-        )
+    # Container scrollable pentru TOATE - în expander
+    if len(st.session_state.combinatii_generate) > 10:
+        with st.expander(f"📜 Vezi toate cele {len(st.session_state.combinatii_generate)} combinații (scrollable)"):
+            toate_combinatii_text = []
+            for i, comb in enumerate(st.session_state.combinatii_generate, 1):
+                toate_combinatii_text.append(formateaza_combinatie(i, comb))
+            
+            st.text_area(
+                "Toate combinațiile",
+                value='\n'.join(toate_combinatii_text),
+                height=400,
+                disabled=True
+            )
     
     st.markdown("---")
     
