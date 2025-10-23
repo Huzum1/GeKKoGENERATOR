@@ -888,8 +888,6 @@ with st.expander("✍️ Adaugă runde manual"):
 
 # Afișare runde salvate
 if st.session_state.runde_salvate:
-    st.info(f"💾 **Au fost introduse {len(st.session_state.runde_salvate)} runde valide** (pentru strategii HOT/COLD)")
-    
     with st.expander("👁️ Vezi rundele salvate"):
         for idx, runda in enumerate(st.session_state.runde_salvate, 1):
             st.text(f"{idx}. [{len(runda)} numere] {', '.join(map(str, runda))}")
@@ -963,13 +961,12 @@ with col_gen2:
 # ============================
 st.subheader("🎲 Selectează Strategiile (bifează 1 sau mai multe)")
 
-col_strat1, col_strat2 = st.columns(2)
-
 strategii_keys = list(STRATEGII.keys())
 jumatate = len(strategii_keys) // 2 + 1
 
+col_strat1, col_strat2 = st.columns(2)
+
 with col_strat1:
-    st.markdown("#### 📌 Coloana 1")
     for strategie in strategii_keys[:jumatate]:
         checked = st.checkbox(
             f"{strategie}",
@@ -984,7 +981,6 @@ with col_strat1:
             st.session_state.strategii_selectate.remove(strategie)
 
 with col_strat2:
-    st.markdown("#### 📌 Coloana 2")
     for strategie in strategii_keys[jumatate:]:
         checked = st.checkbox(
             f"{strategie}",
