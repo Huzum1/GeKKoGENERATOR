@@ -834,8 +834,10 @@ with col1:
                         erori.append(f"Linia {idx}: {rezultat}")
             
             if runde_noi:
-                st.session_state.runde_salvate.extend(runde_noi)
-                st.success(f"✅ {len(runde_noi)} runde valide au fost importate!")
+                # Nu mai salvăm toate pentru a evita lag-ul
+                # Păstrăm doar ultimele 100 pentru strategii HOT/COLD
+                st.session_state.runde_salvate = runde_noi[-100:] if len(runde_noi) > 100 else runde_noi
+                st.success(f"✅ {len(runde_noi)} runde procesate (salvate ultimele {len(st.session_state.runde_salvate)})!")
             
             if erori:
                 with st.expander("⚠️ Vezi erorile la import"):
@@ -875,8 +877,11 @@ with st.expander("✍️ Adaugă runde manual"):
                         st.session_state.numar_max
                     )
                     if valid:
-                        st.session_state.runde_salvate.append(rezultat)
                         runde_adaugate += 1
+                        # Salvăm doar pentru procesare temporară
+                        if runde_adaugate <= 100:  # Limităm la 100
+                            if runde_adaugate not in st.session_state.runde_salvate:
+                                st.session_state.runde_salvate.append(rezultat)
                     else:
                         st.error(rezultat)
             
