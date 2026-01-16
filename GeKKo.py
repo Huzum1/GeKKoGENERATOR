@@ -748,6 +748,36 @@ STRATEGII = {
 # ============================
 # FUNCȚII HELPER
 # ============================
+import math
+
+def entropie_set(combinatii):
+    flat = [n for c in combinatii for n in c]
+    total = len(flat)
+    frec = Counter(flat)
+    return -sum((v/total) * math.log2(v/total) for v in frec.values())
+
+def overlap_mediu(combinatii):
+    if len(combinatii) < 2:
+        return 0
+    overlaps = []
+    for i in range(len(combinatii)):
+        for j in range(i+1, len(combinatii)):
+            overlaps.append(len(set(combinatii[i]) & set(combinatii[j])))
+    return sum(overlaps) / len(overlaps)
+
+def filtreaza_premium(combinatii,
+                      min_entropy=2.30,
+                      max_overlap=1.5):
+    if not combinatii:
+        return combinatii
+
+    rezultat = []
+    for c in combinatii:
+        temp = rezultat + [c]
+        if entropie_set(temp) >= min_entropy and overlap_mediu(temp) <= max_overlap:
+            rezultat.append(c)
+
+    return rezultat
 
 def valideaza_runda(runda_text, numar_numere_asteptat, numar_min, numar_max):
     """Validează o rundă introdusă de utilizator"""
@@ -1068,6 +1098,19 @@ st.markdown("---")
 # ============================
 # SECȚIUNEA REZULTATE
 # ============================
+st.markdown("## ⭐ Premium")
+
+premium_on = st.checkbox("Activează filtre Premium (stabilitate maximă)", value=False)
+
+if premium_on and st.session_state.combinatii_generate:
+    before = len(st.session_state.combinatii_generate)
+    st.session_state.combinatii_generate = filtreaza_premium(
+        st.session_state.combinatii_generate
+    )
+    after = len(st.session_state.combinatii_generate)
+
+    st.success(f"⭐ Premium activ: {before} → {after} variante stabile")
+
 if st.session_state.combinatii_generate:
     st.header("📊 Rezultate Generate")
     
